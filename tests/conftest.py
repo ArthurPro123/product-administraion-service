@@ -81,7 +81,7 @@ from tests.factories import UserFactory
 import common.status_codes as status
 
 @pytest.fixture
-def helper_make_request(test_app, client):
+def helper_make_request(test_app):
     def _make_request(method, path, *args, role_name=None, **kwargs):
         access_token = None
         user = None
@@ -105,18 +105,22 @@ def helper_make_request(test_app, client):
                 db.session.add(user)
                 db.session.commit()
 
-                login_response = client.post(LOGIN_API_URL, json={'email': user.email, 'password': 'test_pass'})
-                assert login_response.status_code == status.HTTP_200_OK
-                access_token = login_response.get_json()['access_token']
+                # Login using test_app's client
+                with test_app.test_client() as client:
+                    login_response = client.post(LOGIN_API_URL, json={'email': user.email, 'password': 'test_pass'})
+                    assert login_response.status_code == status.HTTP_200_OK
+                    access_token = login_response.get_json()['access_token']
 
-            headers = {"Authorization": f"Bearer {access_token}"} if role_name else {}
+                headers = {"Authorization": f"Bearer {access_token}"} if role_name else {}
 
             try:
-                return client.open(path, method=method, headers=headers, *args, **kwargs)
+                with test_app.test_client() as client:
+                    return client.open(path, method=method, headers=headers, *args, **kwargs)
             finally:
                 if user:
                     if DATABASE_URI != 'sqlite:///:memory:':
-                        db.session.delete(user)
-                        db.session.commit()
+                        with test_app.test_client() as client:
+                            db.session.delete(user)
+                            db.session.commit()
 
     return _make_request

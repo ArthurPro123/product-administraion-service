@@ -295,8 +295,8 @@ def test_get_product_not_found(client):
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.get_json() is None
 
-
-def test_update_product(client):
+@pytest.mark.parametrize("role_name", ["Admin", "Sales Manager"])
+def test_update_product(helper_make_request, role_name):
 
     # test_product = _create_products_for_testing(1)[0]
     # --- Or: ------------------------------------
@@ -315,16 +315,27 @@ def test_update_product(client):
     test_product.price = "10.00"
     test_product.available = True
 
-    client.put(f"{PRODUCTS_BASE_API_URL}/{test_product.id}", json=test_product.serialize())
+    response = helper_make_request(
+        'PUT',
+        f"{PRODUCTS_BASE_API_URL}/{test_product.id}",
+        role_name=role_name,
+        json=test_product.serialize(),
+    )
+    assert response.status_code == status.HTTP_200_OK
 
-    response = client.get(f"{PRODUCTS_BASE_API_URL}/{test_product.id}")
+    get_response = helper_make_request(
+        'GET',
+        f"{PRODUCTS_BASE_API_URL}/{test_product.id}",
+    )
+
     assert response.status_code == status.HTTP_200_OK
 
     fetched_product = response.get_json()
     _assert_product_equal(fetched_product, test_product)
 
 
-def test_delete_product(client):
+@pytest.mark.parametrize("role_name", ["Admin"])
+def test_delete_product(client, helper_make_request, role_name):
     """It should Delete a Product"""
 
     # It also verifies that the total number of products in the database 
@@ -334,12 +345,18 @@ def test_delete_product(client):
     product_count = _get_product_count_with_api(client)
     assert product_count == NUM_OF_PRODUCTS_FOR_TEST
 
-    test_product = products[0]
+    test_product = products[0]  # Pick the first product
 
-    response = client.delete(f"{PRODUCTS_BASE_API_URL}/{test_product.id}")
+    response = helper_make_request(
+        'DELETE',
+        f"{PRODUCTS_BASE_API_URL}/{test_product.id}",
+        role_name=role_name,
+    )
+
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert len(response.data) == 0
 
+    # Verify the deleted product is gone
     response = client.get(f"{PRODUCTS_BASE_API_URL}/{test_product.id}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.get_json() is None
