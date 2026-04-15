@@ -1,4 +1,7 @@
+
 # RESTful Product Administration Microservice with Lightweight Web UI
+
+**A production-ready microservice featuring JWT authentication, role-based permissions, and a complete QA automation suite (pytest, behave, Playwright).**
 
 <table align="center">
   <tr>
