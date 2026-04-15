@@ -25,3 +25,4 @@ coverage.xml
 app/tests/
 Session.vim
 features_with_selenium/
+*.mp4

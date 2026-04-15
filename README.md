@@ -9,6 +9,9 @@
 - JWT-based authentication
 - Docker containerization for consistent development and deployment
 
+<div align="center">
+    <img src="screenshots/screencast-behave.gif" alt="Running Test Suite - Happy Path">
+</div>
 
 ## Testing Strategy
 
