@@ -4,13 +4,15 @@
   <tr>
     <td align="center"><img src="screenshots/ui.png" width="200"/></td>
 <!--
-    <td align="center"><img src="screenshots/ui.png" width="200"/></td>
-    <td align="center"><img src="screenshots/ui.png" width="200"/></td>
+    <td align="center"><img src="screenshots/pytest.png" width="200"/></td>
+    <td align="center"><img src="screenshots/behave.png" width="200"/></td>
+    <td align="center"><img src="screenshots/sonar.png" width="200"/></td>
 -->
   </tr>
   <tr>
     <td align="center"><small>Web UI</small></td>
 <!--
+    <td align="center"><small>pytest</small></td>
     <td align="center"><small>Behave</small></td>
     <td align="center"><small>SonarQube</small></td>
 -->
@@ -36,9 +38,10 @@
 
 ```bash
 docker-compose exec test pytest tests/ --spec
-
+```
 
 **Test files cover:**
+
 - Model CRUD operations (`test_models.py`)
 - Route endpoints (`test_routes.py`)
 - Permission-based access control
