@@ -40,7 +40,7 @@ jobs:
 
     - name: Install behave dependencies
       run: |
-        pip install behave playwright
+        pip install behave playwright requests
         playwright install chromium
         playwright install-deps chromium
 

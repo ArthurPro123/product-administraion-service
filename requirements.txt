@@ -17,6 +17,6 @@ pytest==7.4.0
 pytest-spec==3.0.0
 pytest-cov==4.1.0
 
-# BDD Testing
-behave==1.2.6
-playwright==1.40.0
+# BDD Testing (installed separately in CI)
+# behave==1.2.6
+# playwright==1.40.0
