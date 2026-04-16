@@ -13,6 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # --- Preparation: --- #
+
     - name: Create secrets directory
       run: |
         mkdir -p ./secrets
@@ -24,15 +26,24 @@ jobs:
         echo "ENV=development" >> .env
         echo "SECRETS_DIR_PATH=./secrets" >> .env
 
+
+    # --- 1. Run app --- #
+
     - name: Start app container (for both test suites)
       run: |
         docker compose up -d --build app
         sleep 10
 
+
+    # --- 2. Run another instance of app for testing with pytest --- #
+
     - name: Run pytest (in your test container)
       run: |
         docker compose up -d test
         docker compose exec -T test pytest tests/ -v --spec --no-cov
+
+
+    # --- 3. Run behave in its own container --- #
 
     - name: Run BDD tests (in official Playwright container)
       run: |
@@ -43,6 +54,9 @@ jobs:
           -w /app \
           mcr.microsoft.com/playwright/python:v1.40.0-focal \
           python -c "import subprocess, sys; subprocess.run([sys.executable, '-m', 'pip', 'install', 'behave', 'requests']); subprocess.run(['behave', 'features/', '-D', 'browser=chromium', '-D', 'ui=false'])"
+
+
+    # --- Clean up --- #
 
     - name: Shutdown
       if: always()
