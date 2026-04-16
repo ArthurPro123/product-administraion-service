@@ -13,31 +13,38 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
+    - name: Create secrets directory
       run: |
-        pip install behave playwright requests flask flask-sqlalchemy
-        playwright install chromium
+        mkdir -p ./secrets
+        touch ./secrets/cert.pem
+        touch ./secrets/key.pem
 
-    - name: Start Flask app
+    - name: Create .env file
       run: |
-        export FLASK_APP=app/app.py
-        export ENV=development
-        export DATABASE_URI=sqlite:///:memory:
-        flask run --host=0.0.0.0 --port=5000 &
+        echo "ENV=development" >> .env
+        echo "SECRETS_DIR_PATH=./secrets" >> .env
+
+    - name: Start app container (for both test suites)
+      run: |
+        docker compose up -d --build app
         sleep 10
 
-    - name: Run BDD tests
+    - name: Run pytest (in your test container)
       run: |
-        behave features/ -D browser=chromium -D ui=false
-
-    - name: Run pytest with Docker
-      run: |
-        docker compose up -d --build app test
-        sleep 10
+        docker compose up -d test
         docker compose exec -T test pytest tests/ -v --spec --no-cov
+
+    - name: Run BDD tests (in official Playwright container)
+      run: |
+        docker run --rm \
+          --network host \
+          -v $(pwd)/features:/app/features \
+          -v $(pwd)/app:/app/app \
+          -w /app \
+          mcr.microsoft.com/playwright/python:v1.40.0-focal \
+          bash -c "pip install behave requests && behave features/ -D browser=chromium -D ui=false"
+
+    - name: Shutdown
+      if: always()
+      run: |
         docker compose down
