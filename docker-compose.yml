@@ -3,6 +3,7 @@ services:
 
 # Note: `- DISABLE_HTTPS=true` is used for behave.
 
+  # For running behave:
   app:
     build: .
     ports:
@@ -22,6 +23,7 @@ services:
         --host=0.0.0.0
 
 
+  # For running pytest:
   test:
     build: .
     volumes:
