@@ -33,7 +33,7 @@ services:
     volumes:
       # - .:/app
       - ./app:/app  # Mount only the app directory
-      - ${SECRETS_DIR_PATH}:/run/secrets:ro   # read‑only mount
+      - ${SECRETS_DIR_PATH:-./secrets}:/run/secrets:ro  # read-only mount.
       - ./.env:/app/.env  # Mount the .env file too 
 
     environment:

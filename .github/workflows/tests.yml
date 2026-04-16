@@ -13,26 +13,30 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Docker Compose
+    - name: Create secrets directory for CI
       run: |
-        sudo apt-get update
-        sudo apt-get install docker-compose -y
-        docker-compose --version
+        mkdir -p ./secrets
+        # Create dummy certificate files (required for volume mount)
+        touch ./secrets/cert.pem
+        touch ./secrets/key.pem
 
     - name: Build and start containers
+      env:
+        ENV: development
+        SECRETS_DIR_PATH: ./secrets
       run: |
-        docker-compose up -d --build app
+        docker compose up -d --build app
         sleep 10
 
     - name: Run pytest
       run: |
-        docker-compose exec -T test pytest tests/ -v --spec
+        docker compose exec -T test pytest tests/ -v --spec
 
     - name: Run BDD tests
       run: |
-        docker-compose exec -T test behave features/ -D browser=chromium -D ui=false
+        docker compose exec -T test behave features/ -D browser=chromium -D ui=false
 
-    - name: Shutdown
+    - name: Shutdown containers
       if: always()
       run: |
-        docker-compose down
+        docker compose down
