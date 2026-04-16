@@ -53,8 +53,9 @@ jobs:
         docker compose up -d app
         echo "Waiting for app to be ready..."
         sleep 10
-        # Run bdd-tests and stop when tests complete
-        docker compose up --abort-on-container-exit bdd-tests
+
+        NETWORK_NAME=$(docker compose --profile ci ps -q app | xargs docker inspect -f '{{range $net,$v := .NetworkSettings.Networks}}{{printf "%s" $net}}{{end}}') 
+        docker compose --profile ci run --rm --network $NETWORK_NAME bdd-tests
 
 
     # --- Clean up --- #
