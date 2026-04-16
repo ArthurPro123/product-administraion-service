@@ -13,52 +13,41 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Create secrets directory for CI
-      run: |
-        mkdir -p ./secrets
-        touch ./secrets/cert.pem
-        touch ./secrets/key.pem
-
-    - name: Create .env file for CI
-      run: |
-        echo "ENV=development" >> .env
-        echo "SECRETS_DIR_PATH=./secrets" >> .env
-
-    - name: Build and start containers
-      run: |
-        docker compose up -d --build app test
-        sleep 10
-
-    - name: Run pytest (inside container)
-      run: |
-        docker compose exec -T test pytest tests/ -v --spec --no-cov
-
     - name: Setup Python for behave
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    - name: Install behave dependencies
+    - name: Install all dependencies
       run: |
-        pip install behave playwright requests
+        pip install -r requirements.txt
         playwright install chromium
         playwright install-deps chromium
+
+    - name: Create .env file
+      run: |
+        echo "ENV=development" >> .env
+        echo "JWT_SECRET_KEY=test-secret-key" >> .env
 
     - name: Start Flask app for BDD tests
       run: |
         export FLASK_APP=app/app.py
         export ENV=development
         export DATABASE_URI=sqlite:///:memory:
+        export JWT_SECRET_KEY=test-secret-key
         flask run --host=0.0.0.0 --port=5000 &
-        sleep 5
+        sleep 10
+        curl -f http://localhost:5000/ || (echo "App failed to start" && exit 1)
 
-    - name: Run BDD tests (outside container)
+    - name: Run BDD tests
       env:
         BASE_URL: http://localhost:5000
       run: |
         behave features/ -D browser=chromium -D ui=false
 
-    - name: Shutdown containers
-      if: always()
+    - name: Run pytest (with Docker)
       run: |
+        docker compose up -d --build app test
+        sleep 10
+        docker compose exec -T test pytest tests/ -v --spec --no-cov
         docker compose down
