@@ -16,16 +16,17 @@ jobs:
     - name: Create secrets directory for CI
       run: |
         mkdir -p ./secrets
-        # Create dummy certificate files (required for volume mount)
         touch ./secrets/cert.pem
         touch ./secrets/key.pem
 
-    - name: Build and start containers
-      env:
-        ENV: development
-        SECRETS_DIR_PATH: ./secrets
+    - name: Create .env file for CI
       run: |
-        docker compose up -d --build app
+        echo "ENV=development" >> .env
+        echo "SECRETS_DIR_PATH=./secrets" >> .env
+
+    - name: Build and start containers
+      run: |
+        docker compose up -d --build app test
         sleep 10
 
     - name: Run pytest
