@@ -13,6 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+
     # --- Preparation: --- #
 
     - name: Create secrets directory
@@ -27,17 +28,17 @@ jobs:
         echo "SECRETS_DIR_PATH=./secrets" >> .env
 
 
-    # --- 2. Run another instance of app for testing with pytest --- #
+    # --- 1. Run the app for testing with pytest --- #
 
-    - name: Run pytest (in your test container)
+    - name: Run pytest (in the test container)
       run: |
         docker compose up -d test
         docker compose exec -T test pytest tests/ -v --spec --no-cov
 
 
-    # --- 1. Run app --- #
+    # --- 2. Run another instance of the app for BDD tests --- #
 
-    - name: Start app container (for both test suites)
+    - name: Start the app container (for BDD tests)
       run: |
         docker compose up -d --build app
         sleep 10
