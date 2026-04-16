@@ -36,19 +36,15 @@ jobs:
         docker compose exec -T test pytest tests/ -v --spec --no-cov
 
 
-    # --- 2. Run another instance of the app for BDD tests --- #
+    # --- 2. Install dependencies for BDD tests --- #
 
-    # - name: Start app for BDD tests
-    #   run: |
-    #     docker compose up -d app
-    #     echo "Waiting for app to be ready..."
-    #     sleep 10
-
-    - name: Install dependencies
+    - name: Install BDD dependencies
       run: |
         pip install -r requirements.txt
         pip install behave requests playwright
         playwright install chromium
+
+    # --- 3. Run BDD tests natively --- #
 
     - name: Run BDD tests
       run: |
@@ -57,9 +53,7 @@ jobs:
         export FLASK_ENV=development
         export DISABLE_HTTPS=true
         flask run --host=0.0.0.0 --port=5000 &
-
-    # --- 3. Run behave in its own container --- #
-
+        
         # Wait for app to be ready
         sleep 10
         
