@@ -32,12 +32,20 @@ services:
       - ci_network
     command: >
       bash -c "
-        apt-get update && apt-get install -y curl &&
         echo 'Waiting for app to be ready...' &&
-        while ! curl -s http://app:5000/health > /dev/null; do
-          sleep 1
-        done &&
-        echo 'App is ready! Running tests...' &&
+        python -c '
+import requests, time, sys
+for i in range(30):
+    try:
+        requests.get(\"http://app:5000/health\", timeout=2)
+        print(\"App is ready!\")
+        sys.exit(0)
+    except:
+        print(f\"Waiting for app... ({i+1}/30)\")
+        time.sleep(1)
+print(\"App failed to start\")
+sys.exit(1)
+' &&
         pip install behave requests playwright &&
         playwright install chromium &&
         behave features/ -D browser=chromium -D ui=false
