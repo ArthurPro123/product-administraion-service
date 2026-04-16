@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install playwright
+        pip install playwright behave
         playwright install chromium
 
     - name: Create .env file
