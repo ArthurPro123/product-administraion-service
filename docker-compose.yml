@@ -71,5 +71,5 @@ services:
         playwright install chromium &&
         behave features/ -D browser=chromium -D ui=false
       "
-  networks:
-    - bdd_network
+    networks:
+      - bdd_network
