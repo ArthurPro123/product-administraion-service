@@ -32,6 +32,7 @@ services:
       - ci_network
     command: >
       bash -c "
+        apt-get update && apt-get install -y curl &&
         echo 'Waiting for app to be ready...' &&
         while ! curl -s http://app:5000/health > /dev/null; do
           sleep 1
