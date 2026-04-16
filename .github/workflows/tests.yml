@@ -50,7 +50,7 @@ jobs:
     - name: Run BDD tests
       run: |
         # Start app in background
-        docker-compose up -d app
+        docker compose up -d app
         echo "Waiting for app to be ready..."
         sleep 10
         
