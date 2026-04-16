@@ -33,6 +33,11 @@ jobs:
       run: |
         docker compose exec -T test pytest tests/ -v --spec --no-cov
 
+
+    - name: Verify features directory is mounted
+      run: |
+        docker compose exec -T test ls -la /app/features/
+
     - name: Run BDD tests
       run: |
         docker compose exec -T test behave features/ -D browser=chromium -D ui=false
