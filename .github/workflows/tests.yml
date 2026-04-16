@@ -29,9 +29,9 @@ jobs:
         docker compose up -d --build app test
         sleep 10
 
-    - name: Run pytest
+    - name: Run pytest (without coverage)
       run: |
-        docker compose exec -T test pytest tests/ -v --spec
+        docker compose exec -T test pytest tests/ -v --spec --no-cov
 
     - name: Run BDD tests
       run: |
