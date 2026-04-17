@@ -46,27 +46,6 @@ if FIREFOX_PATH and not os.path.exists(FIREFOX_PATH):
 
 
 # ============================================
-# HELPER FUNCTIONS
-# ============================================
-
-def helper_get_element_id(element_name):
-    """'Product Name' → 'product_name'"""
-    return ID_PREFIX + element_name.lower().replace(' ', '_')
-
-def helper_get_button_id(button_name):
-    """'Create' → 'create-btn'"""
-    return button_name.lower().replace(' ', '_') + '-btn'
-
-def helper_get_category_id(category_name):
-    """'FOOD' → 2"""
-    category_map = {
-        'CLOTHS': 1, 'FOOD': 2, 'HOUSEWARES': 3,
-        'AUTOMOTIVE': 4, 'TOOLS': 5, 'UNKNOWN': 6
-    }
-    return category_map.get(category_name.upper(), 6)
-
-
-# ============================================
 # BROWSER LAUNCHER
 # ============================================
 
@@ -114,11 +93,6 @@ def before_all(context):
     # Get browser from command line: behave -D browser=chromium
     browser_name = context.config.userdata.get('browser', 'firefox').lower()
 
-    # Make helpers available
-    context.helper_get_element_id = helper_get_element_id
-    context.helper_get_button_id = helper_get_button_id
-    context.helper_get_category_id = helper_get_category_id
-    
     # Setup Playwright with selected browser
     context.playwright = sync_playwright().start()
     context.browser = launch_browser(context.playwright, browser_name, ui_mode)
@@ -129,6 +103,14 @@ def before_all(context):
     print(f"Browser: {browser_name}")
     print(f"UI Mode: {ui_mode} (headed={ui_mode}, headless={not ui_mode})")
     print(f"WAIT_SECONDS: {context.wait_seconds}")
+
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    context.logger = logging.getLogger('behave')
+
 
 def after_all(context):
     """Executed after all tests"""

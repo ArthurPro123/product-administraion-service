@@ -109,9 +109,9 @@ def step_impl(context):
         }
         response = requests.post(rest_endpoint, json=payload, headers=headers)
 
-        print(f"POST Status: {response.status_code}")
-        print(f"POST Response: {response.text}")
-        print(f"POST Headers: {response.request.headers}")
+        context.logger.info(f"POST Status: {response.status_code}")
+        context.logger.info(f"POST Response: {response.text}")
+        context.logger.info(f"POST Headers: {response.request.headers}")
 
         assert response.status_code == HTTP_201_CREATED
 

@@ -3,6 +3,8 @@ Feature: The product store service back-end
     I need a RESTful catalog service
     So that I can keep track of all my products
 
+
+
 Background:
     Given the following products
         | name       | description     | price   | available | category   |
@@ -12,10 +14,13 @@ Background:
         | Sheets     | Full bed sheets | 87.00   | True      | HOUSEWARES |
 
 
+
 Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Product Catalog Administration" in the title
     And I should not see "404 Not Found"
+
+
 
 Scenario: Create a Product
     Given I am logged in as an admin
@@ -40,3 +45,26 @@ Scenario: Create a Product
     And I should see "True" in the "Available" dropdown
     And I should see "Tools" in the "Category" dropdown
     And I should see "34.95" in the "Price" field
+
+
+Scenario: Cannot create a product with a duplicate name
+    Given I am logged in as an admin
+    And a product named "Hammer" already exists
+    When I visit the "Home Page"
+    And I set the "Name" to "Hammer"
+    And I set the "Price" to "34.95"
+    And I select "Tools" in the "Category" dropdown
+    And I press the "Create" button
+    Then I should see the message "Product with this name already exists"
+
+
+
+Scenario: Cannot create a product without a name
+    Given I am logged in as an admin
+    When I visit the "Home Page"
+		And I leave the "Name" field empty
+    And I set the "Price" to "20.05"
+    And I press the "Create" button
+    Then I should see the message "Product name is required"
+
+
