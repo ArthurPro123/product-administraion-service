@@ -12,8 +12,7 @@
     <td align="center"><img src="screenshots/github-actions.png" width="200"/></td>
 <!--
     <td align="center"><img src="screenshots/sonar.png" width="200"/></td>
-
-    <td align="center"><img src="screenshots/pytest.png" width="200"/></td>
+    ### <td align="center"><img src="screenshots/pytest.png" width="200"/></td>
 -->
   </tr>
   <tr>
@@ -23,8 +22,7 @@
     <td align="center"><small>GitHub Actions</small></td>
 <!--
     <td align="center"><small>SonarQube</small></td>
-
-    <td align="center"><small>pytest</small></td>
+    ### <td align="center"><small>pytest</small></td>
 -->
   </tr>
 </table>
