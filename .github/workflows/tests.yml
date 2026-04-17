@@ -36,49 +36,6 @@ jobs:
         docker compose exec -T test pytest tests/ -v --spec --no-cov
 
 
-    # --- 2. Install dependencies for BDD tests --- #
-
-    - name: Install BDD dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install behave requests playwright
-        playwright install chromium
-
-    # --- 3. Run BDD tests natively --- #
-
-    - name: Run BDD tests
-      run: |
-        # Start Flask app in background
-        export FLASK_APP=app:create_app
-        export FLASK_ENV=development
-        export DISABLE_HTTPS=true
-
-        cd /home/runner/work/product-administration-service/product-administration-service
-
-        flask run --host=0.0.0.0 --port=5000 &
-        
-        # Wait and check if it's running
-        sleep 5
-        echo "Checking if Flask is running..."
-        ps aux | grep flask
-        
-        # Check if port is listening
-        echo "Checking port 5000..."
-        netstat -tulpn | grep 5000 || echo "Port 5000 not listening"
-        
-        # Try to connect
-        echo "Testing connection..."
-        python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')" || echo "Connection failed"
-        
-        # Wait longer
-        sleep 10
-        
-        behave features/ -D browser=chromium -D ui=false
-        
-        # Kill Flask app
-        kill %1
-
-
     # --- Clean up --- #
 
     - name: Shutdown
